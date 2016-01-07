@@ -155,7 +155,7 @@
                     "osdisk": {
                         "name": "osdisk",
                         "vhd": {
-                            "uri": "[concat('http://', parameters('storageblobname'), '.blob.core.azurestack.local/', parameters('storageaccountcontainername'), '/', 'osdisk.vhd')]"
+                            "uri": "[concat('http://', parameters('storageblobname'), '.blob.azurestack.local/', parameters('storageaccountcontainername'), '/', 'osdisk.vhd')]"
                         },
                         "caching": "readwrite",
                         "createoption": "FromImage"
