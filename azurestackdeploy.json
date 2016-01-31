@@ -24,17 +24,34 @@
             "type": "string",
             "defaultValue": "knazurevnet100"
         },
-        "storageblobname": {
-            "type": "string",
-            "defaultValue": "knazstorage100"
-        },
-        "storageaccountcontainername": {
-            "type": "string",
-            "defaultValue": "vhds"
-        },
+      "storageblobname": {
+        "type": "string",
+        "defaultValue": "knazstorage100"
+      },
+      "storageaccountcontainername": {
+        "type": "string",
+        "defaultValue": "vhds"
+      },
+      "storageendpoint": {
+        "type": "string",
+        "defaultValue": "blob.azurestack.local",
+        "allowedValues": [
+          "blob.azurestack.local",
+          "blob.core.windows.net"
+        ],
+        "metadata": {
+          "Description": "Use blob.azurestack.local for MAS TP1 - and blob.core.windows.net for Azure"
+        }
+      },
         "location": {
             "type": "string",
-            "defaultValue": "local"
+          "defaultValue": "local",
+          "allowedValues": [
+            "local",
+            "west europe",
+            "north europe",
+            "west us"
+          ]
         },
         "dscurl": {
             "type": "string",
@@ -45,34 +62,49 @@
             "defaultValue": "azureweb.ps1\\mywebserver"
         }
     },
-    "variables": {
-        "virtualNetworkName": "[parameters('vnetname')]",
-        "vnetID": "[resourceId('Microsoft.Network/virtualnetworks', variables('virtualnetworkname'))]",
-        "subnetname": "ccsubnet01",
-        "addressprefix": "192.168.0.0/16",
-        "subnetPrefix": "192.168.0.0/24",
-        "subnetRef": "[concat(variables('vnetID'),'/subnets/', variables('subnetname'))]",
-        "nicname": "knnic20",
-        "publicnicname": "knpub202test",
-        "imagepublisher": "MicrosoftWindowsServer",
-        "imageoffer": "WindowsServer",
-        "ipallocation": "Dynamic",
-        "storagetype": "Standard_LRS",
-        "imagesku": "2012-R2-Datacenter",
-        "extensionname": "dscExtension"
+  "variables": {
+    "apiVersion": {
+      "Compute": {
+        "VirtualMachines": "2015-06-15",
+        "Extensions": "2015-06-15"
+      },
+      "Storage": {
+        "storageAccounts": "2015-06-15"
+      },
+      "network": {
+        "virtualnetworks": "2015-06-15",
+        "publicIPaddress": "2015-06-15",
+        "networkinterface": "2015-06-15"
+      }
     },
+    "storagename": "[toLower(concat(parameters('storageblobname'), uniqueString(resourceGroup().id)))]",
+    "virtualNetworkName": "[parameters('vnetname')]",
+    "vnetID": "[resourceId('Microsoft.Network/virtualnetworks', variables('virtualnetworkname'))]",
+    "subnetname": "ccsubnet01",
+    "addressprefix": "192.168.0.0/16",
+    "subnetPrefix": "192.168.0.0/24",
+    "subnetRef": "[concat(variables('vnetID'),'/subnets/', variables('subnetname'))]",
+    "nicname": "knnic20",
+    "publicnicname": "knpub202test",
+    "imagepublisher": "MicrosoftWindowsServer",
+    "imageoffer": "WindowsServer",
+    "ipallocation": "Dynamic",
+    "storagetype": "Standard_LRS",
+    "imagesku": "2012-R2-Datacenter",
+    "extensionname": "dscExtension"
+  },
     "resources": [
         {
-            "apiVersion": "2015-06-15",
+            "apiVersion": "[variables('apiVersion').Storage.storageaccounts]",
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[parameters('storageblobname')]",
+            "name": "[variables('storagename')]",
             "location": "[parameters('location')]",
             "properties": {
                 "accountType": "[variables('storagetype')]"
             }
         },
         {
-            "apiVersion": "2015-05-01-preview",
+            "apiVersion": "[variables('apiVersion').network.publicIPaddress]",
             "type": "Microsoft.Network/PublicIPAddresses",
             "name": "[variables('publicnicname')]",
             "location": "[parameters('location')]",
@@ -81,7 +113,7 @@
             }
         },
         {
-            "apiVersion": "2015-05-01-preview",
+            "apiVersion": "[variables('apiVersion').network.virtualnetworks]",
             "type": "Microsoft.Network/virtualnetworks",
             "name": "[parameters('vnetname')]",
             "location": "[parameters('location')]",
@@ -102,7 +134,7 @@
             }
         },
         {
-            "apiVersion": "2015-05-01-preview",
+            "apiVersion": "[variables('apiVersion').network.networkinterface]",
             "type": "Microsoft.Network/networkInterfaces",
             "name": "[variables('nicname')]",
             "location": "[parameters('location')]",
@@ -128,12 +160,12 @@
             }
         },
         {
-            "apiVersion": "2015-06-15",
+            "apiVersion": "[variables('apiVersion').compute.virtualmachines]",
             "type": "Microsoft.Compute/VirtualMachines",
             "name": "[parameters('vmname')]",
             "location": "[parameters('location')]",
             "dependsOn": [
-                "[concat('Microsoft.Storage/StorageAccounts/', parameters('storageblobname'))]",
+                "[concat('Microsoft.Storage/StorageAccounts/', variables('storagename'))]",
                 "[concat('Microsoft.Network/networkinterfaces/', variables('nicname'))]"
             ],
             "properties": {
@@ -155,7 +187,7 @@
                     "osdisk": {
                         "name": "osdisk",
                         "vhd": {
-                            "uri": "[concat('http://', parameters('storageblobname'), '.blob.azurestack.local/', parameters('storageaccountcontainername'), '/', 'osdisk.vhd')]"
+                            "uri": "[concat('http://', variables('storageName'),'.', parameters('StorageEndpoint'), '/',  parameters('storageaccountcontainername'), '/', 'osdisk.vhd')]"
                         },
                         "caching": "readwrite",
                         "createoption": "FromImage"
@@ -171,7 +203,7 @@
             }
         },
         {
-            "apiVersion": "2015-06-15",
+            "apiVersion": "[variables('apiVersion').compute.extensions]",
             "type": "Microsoft.Compute/virtualmachines/extensions",
             "name": "[concat(parameters('vmname'), '/', variables('extensionname'))]",
             "location": "[parameters('location')]",
