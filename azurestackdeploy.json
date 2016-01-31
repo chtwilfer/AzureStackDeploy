@@ -77,7 +77,6 @@
         "networkinterface": "2015-06-15"
       }
     },
-    "storagename": "[toLower(concat(parameters('storageblobname'), uniqueString(resourceGroup().id)))]",
     "virtualNetworkName": "[parameters('vnetname')]",
     "vnetID": "[resourceId('Microsoft.Network/virtualnetworks', variables('virtualnetworkname'))]",
     "subnetname": "ccsubnet01",
@@ -97,7 +96,7 @@
         {
             "apiVersion": "[variables('apiVersion').Storage.storageaccounts]",
             "type": "Microsoft.Storage/storageAccounts",
-            "name": "[variables('storagename')]",
+            "name": "[parameters('storageblobname')]",
             "location": "[parameters('location')]",
             "properties": {
                 "accountType": "[variables('storagetype')]"
@@ -187,7 +186,7 @@
                     "osdisk": {
                         "name": "osdisk",
                         "vhd": {
-                            "uri": "[concat('http://', variables('storageName'),'.', parameters('StorageEndpoint'), '/',  parameters('storageaccountcontainername'), '/', 'osdisk.vhd')]"
+                            "uri": "[concat('http://', parameters('storageblobname'),'.', parameters('StorageEndpoint'), '/',  parameters('storageaccountcontainername'), '/', 'osdisk.vhd')]"
                         },
                         "caching": "readwrite",
                         "createoption": "FromImage"
