@@ -1,2 +1,2 @@
 # AzureStackDeploy
-ARM Templates for Microsoft Azure Stack
+ARM Templates for Microsoft Azure Stack and Microsoft Azure
