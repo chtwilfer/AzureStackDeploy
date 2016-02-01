@@ -72,9 +72,9 @@
         "storageAccounts": "2015-06-15"
       },
       "network": {
-        "virtualnetworks": "2015-06-15",
-        "publicIPaddress": "2015-06-15",
-        "networkinterface": "2015-06-15"
+        "virtualnetworks": "2015-05-01-preview",
+        "publicIPaddress": "2015-05-01-preview",
+        "networkinterface": "2015-05-01-preview"
       }
     },
     "virtualNetworkName": "[parameters('vnetname')]",
