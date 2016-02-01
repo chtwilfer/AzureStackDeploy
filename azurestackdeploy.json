@@ -212,7 +212,7 @@
             "properties": {
                 "publisher": "Microsoft.Powershell",
                 "type": "DSC",
-                "typeHandlerversion": "2.7",
+                "typeHandlerversion": "2.8",
                 "autoUpgradeMinorVersion": "true",
                 "settings": {
                     "ModulesUrl": "[parameters('dscurl')]",
